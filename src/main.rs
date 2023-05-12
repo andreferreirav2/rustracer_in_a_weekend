@@ -4,6 +4,7 @@
 use error_iter::ErrorIter as _;
 use log::error;
 use pixels::{Error, Pixels, SurfaceTexture};
+use std::time::{Instant};
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
@@ -36,15 +37,30 @@ fn main() -> Result<(), Error> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
     let mut world = World::new();
+    let mut draw_calls = 0;
+    let mut draw_calls_duration = 0.0;
+    let mut instant_of_last_call = Instant::now();
 
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
+            let before_draw = Instant::now();
             world.draw(pixels.frame_mut());
+            draw_calls_duration += before_draw.elapsed().as_secs_f64();
+
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;
                 return;
+            }
+
+            // fps counter
+            draw_calls += 1;
+            if instant_of_last_call.elapsed().as_secs_f64() > 1.0 {
+                println!("{:.2} render fps, {:.2} real fps", (draw_calls as f64) / draw_calls_duration, (draw_calls as f64) / instant_of_last_call.elapsed().as_secs_f64());
+                instant_of_last_call = Instant::now();
+                draw_calls_duration = 0.0;
+                draw_calls = 0;
             }
         }
 
