@@ -11,6 +11,11 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
+mod vec3;
+use crate::vec3::Vec3;
+use Vec3 as Color;
+use Vec3 as Point3;
+
 const WIDTH: u32 = 320;
 const HEIGHT: u32 = 240;
 
@@ -109,15 +114,8 @@ impl World {
             let x = (i % WIDTH as usize) as f64;
             let y = (i / WIDTH as usize) as f64;
 
-            let r = x / ((WIDTH-1) as f64);
-            let g = y / ((HEIGHT-1) as f64);
-            let b = 0.25;
-
-            let ir: u8 = (255.999 * r) as u8;
-            let ig: u8 = (255.999 * g) as u8;
-            let ib: u8 = (255.999 * b) as u8;
-
-            let rgba = [ir, ig, ib, 0xff];
+            let color = Color{i: x / ((WIDTH-1) as f64), j: y / ((HEIGHT-1) as f64), k: 0.25};
+            let rgba = color.as_rgba();
 
             pixel.copy_from_slice(&rgba);
         }
