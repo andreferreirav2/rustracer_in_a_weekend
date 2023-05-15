@@ -11,6 +11,10 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
+    pub fn new(i: f64, j: f64, k: f64) -> Vec3 {
+        Vec3 { i, j, k }
+    }
+
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
@@ -132,32 +136,5 @@ impl DivAssign<f64> for Vec3 {
         self.i /= rhs;
         self.j /= rhs;
         self.k /= rhs;
-    }
-}
-
-fn main() {
-    {
-        let v1 = Vec3 {i:1.0, j:2.0, k:3.0};
-        println!("{}", v1.length());
-    }
-    {
-        let v1 = Vec3 {i:1.0, j:2.0, k:3.0};
-        let v2 = Vec3 {i:-1.0, j:2.0, k:3.0};
-
-        println!("{:?}", v1.dot(&v2));
-        println!("{:?}", v1.cross(&v2));
-    }
-    {
-        let v1 = Vec3 {i:1.0, j:2.0, k:3.0};
-        println!("{:?}", v1.normalized());
-    }
-    {
-        let v1 = Vec3 {i:1.0, j:2.0, k:3.0};
-        println!("{:?}", v1 * 2.0);
-    }
-    {
-        let v2 = Vec3 {i:-1.0, j:2.0, k:3.0};
-        let v1 = Vec3 {i:1.0, j:2.0, k:3.0};
-        println!("{:?}", v1 * v2);
     }
 }

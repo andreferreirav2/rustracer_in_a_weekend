@@ -24,7 +24,7 @@ fn main() -> Result<(), Error> {
     let window = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
-            .with_title("Raytracer in a weekend")
+            .with_title("Rustracer in a weekend")
             .with_inner_size(size)
             .with_min_inner_size(size)
             .build(&event_loop)
