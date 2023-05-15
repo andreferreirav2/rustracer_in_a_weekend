@@ -4,10 +4,10 @@ use Vec3 as Point3;
 
 use super::ray::Ray;
 use super::camera::Camera;
+use super::shapes::{Sphere, HitResult, Hittable, HitPoint};
 
 const WHITE: Color = Color{i: 1.0, j: 1.0, k: 1.0};
 const LIGHT_BLUE: Color = Color{i: 0.5, j: 0.7, k: 1.0};
-const RED: Color = Color{i: 1.0, j: 0.0, k: 0.0};
 
 pub struct World {
     width: u32,
@@ -41,35 +41,17 @@ impl World {
 }
 
 fn ray_color(ray: Ray) -> Color {
-    match cast_ray_into_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, &ray) {
-        RayCastResult::NoHit => {
+    let sphere = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5);
+
+    match sphere.hit(&ray, 0.0, 10.0) {
+        HitResult::NoHit => {
             let unit_direction = ray.dir.normalized();
             let t = 0.5*(unit_direction.j + 1.0);
             
             WHITE * (1.0-t) + LIGHT_BLUE * t
         }
-        RayCastResult::Hit(t) => {
-            let normal = (ray.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalized();
+        HitResult::Hit(HitPoint{point: _, normal, t: _, face: _}) => {
             (normal + WHITE) * 0.5
         }
-    }
-}
-
-enum RayCastResult {
-    Hit(f64),
-    NoHit
-}
-
-fn cast_ray_into_sphere(center: Point3, radius: f64, ray: &Ray) -> RayCastResult {
-    let offset: Vec3 = ray.origin - center;
-    let a = Vec3::dot(&ray.dir, &ray.dir);
-    let b = 2.0 * Vec3::dot(&offset, &ray.dir);
-    let c = Vec3::dot(&offset, &offset) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-
-    if discriminant < 0.0 {
-        RayCastResult::NoHit
-    } else {
-        RayCastResult::Hit((-b - discriminant.sqrt() ) / (2.0*a))
     }
 }

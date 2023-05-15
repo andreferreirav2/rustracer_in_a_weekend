@@ -4,9 +4,9 @@ use Vec3 as Point3;
 use super::ray::Ray;
 
 pub struct Camera {
-    viewport_width: f64,
-    viewport_height: f64,
-    focal_length: f64,
+    //viewport_width: f64,
+    //iewport_height: f64,
+    //focal_length: f64,
     origin: Point3,
     horizontal: Vec3,
     vertical: Vec3,
@@ -21,9 +21,9 @@ impl Camera {
         let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3::new(0.0, 0.0, focal_length);
 
         Self {
-            viewport_width,
-            viewport_height,
-            focal_length,
+            //viewport_width,
+            //viewport_height,
+            //focal_length,
 
             origin,
             horizontal,
