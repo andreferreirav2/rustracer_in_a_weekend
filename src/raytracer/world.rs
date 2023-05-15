@@ -32,7 +32,6 @@ impl World {
             let u = x / (self.width as f64);
             let v = 1.0 - y / (self.height as f64);
 
-            //let color = Color{i: x / ((self.width-1) as f64), j: y / ((self.height-1) as f64), k: 0.25};
             let color = ray_color(self.camera.ray_at(u, v));
             let rgba = color.as_rgba();
 
@@ -42,23 +41,35 @@ impl World {
 }
 
 fn ray_color(ray: Ray) -> Color {
-    if hits_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, &ray) {
-        RED
-    }
-    else {
-        let unit_direction = ray.dir.normalized();
-        let t = 0.5*(unit_direction.j + 1.0);
-        
-        WHITE * (1.0-t) + LIGHT_BLUE * t
+    match cast_ray_into_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, &ray) {
+        RayCastResult::NoHit => {
+            let unit_direction = ray.dir.normalized();
+            let t = 0.5*(unit_direction.j + 1.0);
+            
+            WHITE * (1.0-t) + LIGHT_BLUE * t
+        }
+        RayCastResult::Hit(t) => {
+            let normal = (ray.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalized();
+            (normal + WHITE) * 0.5
+        }
     }
 }
 
-fn hits_sphere(center: Point3, radius: f64, ray: &Ray) -> bool {
-    let oc: Vec3 = ray.origin - center;
+enum RayCastResult {
+    Hit(f64),
+    NoHit
+}
+
+fn cast_ray_into_sphere(center: Point3, radius: f64, ray: &Ray) -> RayCastResult {
+    let offset: Vec3 = ray.origin - center;
     let a = Vec3::dot(&ray.dir, &ray.dir);
-    let b = 2.0 * Vec3::dot(&oc, &ray.dir);
-    let c = Vec3::dot(&oc, &oc) - radius * radius;
+    let b = 2.0 * Vec3::dot(&offset, &ray.dir);
+    let c = Vec3::dot(&offset, &offset) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
 
-    discriminant > 0.0
+    if discriminant < 0.0 {
+        RayCastResult::NoHit
+    } else {
+        RayCastResult::Hit((-b - discriminant.sqrt() ) / (2.0*a))
+    }
 }

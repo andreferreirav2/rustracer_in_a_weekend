@@ -33,6 +33,10 @@ impl Camera {
     }
 
     pub fn ray_at(&self, u: f64, v: f64) -> Ray {
+        if u < 0.0 || u > 1.0 || v < 0.0 || v > 1.0 {
+            println!("u {:2}, v {:2}", u, v);
+        }
+
         Ray {
             origin: self.origin, 
             dir: self.lower_left_corner + self.horizontal * u + self.vertical * v - self.origin
