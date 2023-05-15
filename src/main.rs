@@ -11,16 +11,11 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
-mod vec3;
-use crate::vec3::Vec3;
-use Vec3 as Color;
-use Vec3 as Point3;
+mod raytracer;
+use raytracer::world::World;
 
 const WIDTH: u32 = 320;
 const HEIGHT: u32 = 240;
-
-struct World {
-}
 
 fn main() -> Result<(), Error> {
     env_logger::init();
@@ -41,7 +36,8 @@ fn main() -> Result<(), Error> {
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
-    let mut world = World::new();
+
+    let mut world = World::new(WIDTH, HEIGHT);
     let mut draw_calls = 0;
     let mut draw_calls_duration = 0.0;
     let mut instant_of_last_call = Instant::now();
@@ -97,27 +93,5 @@ fn log_error<E: std::error::Error + 'static>(method_name: &str, err: E) {
     error!("{method_name}() failed: {err}");
     for source in err.sources().skip(1) {
         error!("  Caused by: {source}");
-    }
-}
-
-impl World {
-    fn new() -> Self {
-        Self {}
-    }
-
-    fn update(&mut self) {
-    }
-
-    /// Draw the `World` state to the frame buffer.
-    fn draw(&self, frame: &mut [u8]) {
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let x = (i % WIDTH as usize) as f64;
-            let y = (i / WIDTH as usize) as f64;
-
-            let color = Color{i: x / ((WIDTH-1) as f64), j: y / ((HEIGHT-1) as f64), k: 0.25};
-            let rgba = color.as_rgba();
-
-            pixel.copy_from_slice(&rgba);
-        }
     }
 }
