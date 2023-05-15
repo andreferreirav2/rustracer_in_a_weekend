@@ -34,11 +34,16 @@ pub struct HittableList {
 }
 
 impl HittableList {
-    fn add(&mut self, hittable: Box<dyn Hittable>) {
+    pub fn new(elements: Vec<Box<dyn Hittable>>) -> Self {
+        Self {
+            elements
+        }
+    }
+    pub fn add(&mut self, hittable: Box<dyn Hittable>) {
         self.elements.push(hittable);
     }
 
-    fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.elements.clear();
     }
 }
