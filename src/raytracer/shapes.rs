@@ -1,8 +1,11 @@
+use std::cmp::Ordering;
+
 use super::vec3::Vec3;
 use Vec3 as Point3;
 
 use super::ray::Ray;
 
+#[derive(PartialEq, Eq)]
 pub enum HitFace {
     Front,
     Back
@@ -22,6 +25,37 @@ pub enum HitResult {
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> HitResult;
+}
+
+////////////////////////////
+
+pub struct HittableList {
+    elements: Vec<Box<dyn Hittable>>
+}
+
+impl HittableList {
+    fn add(&mut self, hittable: Box<dyn Hittable>) {
+        self.elements.push(hittable);
+    }
+
+    fn clear(&mut self) {
+        self.elements.clear();
+    }
+}
+
+impl Hittable for HittableList {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> HitResult {
+        self.elements.iter()
+            .map(|e| e.hit(ray, t_min, t_max))
+            .fold(HitResult::NoHit, |prev, curr| 
+                match (&prev, &curr) {
+                    (HitResult::NoHit, _) => curr,
+                    (_, HitResult::NoHit) => prev,
+                    (HitResult::Hit(prev_point), HitResult::Hit(curr_point)) => {
+                        if prev_point.t < curr_point.t { prev } else { curr }
+                    }
+                })
+    }
 }
 
 ////////////////////////////
