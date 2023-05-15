@@ -5,8 +5,9 @@ use Vec3 as Point3;
 use super::ray::Ray;
 use super::camera::Camera;
 
-const WHITE: Vec3 = Color{i: 1.0, j: 1.0, k: 1.0};
-const LIGHT_BLUE: Vec3 = Color{i: 0.5, j: 0.7, k: 1.0};
+const WHITE: Color = Color{i: 1.0, j: 1.0, k: 1.0};
+const LIGHT_BLUE: Color = Color{i: 0.5, j: 0.7, k: 1.0};
+const RED: Color = Color{i: 1.0, j: 0.0, k: 0.0};
 
 pub struct World {
     width: u32,
@@ -41,8 +42,23 @@ impl World {
 }
 
 fn ray_color(ray: Ray) -> Color {
-    let unit_direction = ray.dir.normalized();
-    let t = 0.5*(unit_direction.j + 1.0);
-    
-    WHITE * (1.0-t) + LIGHT_BLUE * t
+    if hits_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, &ray) {
+        RED
+    }
+    else {
+        let unit_direction = ray.dir.normalized();
+        let t = 0.5*(unit_direction.j + 1.0);
+        
+        WHITE * (1.0-t) + LIGHT_BLUE * t
+    }
+}
+
+fn hits_sphere(center: Point3, radius: f64, ray: &Ray) -> bool {
+    let oc: Vec3 = ray.origin - center;
+    let a = Vec3::dot(&ray.dir, &ray.dir);
+    let b = 2.0 * Vec3::dot(&oc, &ray.dir);
+    let c = Vec3::dot(&oc, &oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+
+    discriminant > 0.0
 }
